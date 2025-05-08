@@ -7,9 +7,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Bean
+    @Bean(name = "externalApiWebClient")
     public WebClient externalApiWebClient() {
         return WebClient.builder().baseUrl("http://localhost:3001").build();
     }
+
 }
 

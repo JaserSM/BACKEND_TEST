@@ -1,9 +1,12 @@
 package com.apiproducts.backendtest.controller;
 
 import com.apiproducts.backendtest.dto.ProductDetailDTO;
+import com.apiproducts.backendtest.exception.ProductNotFoundException;
 import com.apiproducts.backendtest.service.SimilarProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +22,20 @@ import java.util.List;
 @RequestMapping("/product")
 public class SimilarProductController {
 
-    @Autowired
-    private SimilarProductService service;
+    private final SimilarProductService service;
 
-    @GetMapping(value = "/{productId}/similar", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<ProductDetailDTO> getSimilarProducts(@PathVariable String productId) {
-        return service.getSimilarProducts(productId);
+    public SimilarProductController(SimilarProductService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/{productId}/similar")
+    public ResponseEntity<List<ProductDetailDTO>> getSimilarProducts(@PathVariable String productId) {
+        try {
+            List<ProductDetailDTO> result = service.getSimilarProducts(productId);
+            log.info("JM long.info: {}",result);
+            return ResponseEntity.ok(result);
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
